@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="overlay" class="hidden">
+  <div id="panel">
+
+    <!-- HEADER -->
+    <div id="header">
+      <div id="header-left">
+        <div id="logo">⚔</div>
+        <div>
+          <div id="title">ADMIN PANEL</div>
+          <div id="subtitle" class="muted">Sistema di amministrazione</div>
+        </div>
+      </div>
+      <button id="close-btn" onclick="closePanel()">✕</button>
+    </div>
+
+    <!-- TABS -->
+    <div id="tabs">
+      <button class="tab active" data-tab="players">👥 Players</button>
+      <button class="tab" data-tab="bans">🔨 Ban</button>
+      <button class="tab" data-tab="economy">💰 Economia</button>
+      <button class="tab" data-tab="whitelist">📋 Whitelist</button>
+      <button class="tab" data-tab="staff">🛡 Staff</button>
+    </div>
+
+    <!-- ==================== TAB: PLAYERS ==================== -->
+    <div id="tab-players" class="tab-content active">
+      <div class="toolbar">
+        <input type="text" id="search-players" placeholder="🔍 Cerca player..." oninput="filterPlayers()">
+        <button class="btn-icon" onclick="refreshPlayers()" title="Aggiorna">↺</button>
+      </div>
+      <div id="players-list"></div>
+    </div>
+
+    <!-- ==================== TAB: BAN ==================== -->
+    <div id="tab-bans" class="tab-content">
+      <div class="section-title">Ban attivi</div>
+      <div class="toolbar">
+        <input type="text" id="search-bans" placeholder="🔍 Cerca ban..." oninput="filterBans()">
+        <button class="btn-primary" onclick="requestBanList()">Aggiorna lista</button>
+      </div>
+      <div id="ban-list" class="muted" style="text-align:center;padding:20px;">
+        Clicca "Aggiorna lista" per caricare i ban.
+      </div>
+    </div>
+
+    <!-- ==================== TAB: ECONOMIA ==================== -->
+    <div id="tab-economy" class="tab-content">
+      <div class="section-title">Gestione Economia</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>ID / Nome Player</label>
+          <input type="text" id="econ-target" placeholder="ID o nome">
+        </div>
+        <div class="form-group">
+          <label>Importo</label>
+          <input type="number" id="econ-amount" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>Conto</label>
+          <select id="econ-account">
+            <option value="cash">Cash</option>
+            <option value="bank">Banca</option>
+            <option value="black_money">Black Money</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-success" onclick="giveMoney()">✚ Dai soldi</button>
+        <button class="btn-warning" onclick="setMoney()">= Imposta soldi</button>
+        <button class="btn-info" onclick="getMoney()">👁 Visualizza soldi</button>
+      </div>
+      <div id="econ-result" class="result-box hidden"></div>
+    </div>
+
+    <!-- ==================== TAB: WHITELIST ==================== -->
+    <div id="tab-whitelist" class="tab-content">
+      <div class="section-title">Gestione Whitelist</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Identifier (license:xxx / steam:xxx)</label>
+          <input type="text" id="white-id" placeholder="license:abcdef...">
+        </div>
+        <div class="form-group">
+          <label>Nome (opzionale)</label>
+          <input type="text" id="white-name" placeholder="Nome player">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-success" onclick="whitelistAdd()">✚ Aggiungi</button>
+        <button class="btn-danger" onclick="whitelistRemove()">✕ Rimuovi</button>
+        <button class="btn-info" onclick="requestWhitelist()">📋 Lista</button>
+      </div>
+      <div id="whitelist-result" class="muted" style="text-align:center;padding:16px;"></div>
+    </div>
+
+    <!-- ==================== TAB: STAFF ==================== -->
+    <div id="tab-staff" class="tab-content">
+      <div class="section-title">Staff online</div>
+      <button class="btn-primary" onclick="requestAdminList()" style="margin-bottom:12px">Aggiorna</button>
+      <div id="staff-list" class="muted" style="text-align:center;padding:20px;">
+        Clicca "Aggiorna" per vedere lo staff online.
+      </div>
+    </div>
+
+    <!-- PLAYER ACTION MODAL -->
+    <div id="action-modal" class="modal hidden">
+      <div class="modal-box">
+        <div class="modal-header">
+          <span id="modal-player-name">Player</span>
+          <button onclick="closeModal()">✕</button>
+        </div>
+        <div id="modal-player-info" class="muted" style="margin-bottom:12px;font-size:12px;"></div>
+
+        <div class="action-grid">
+          <button class="action-btn btn-danger"  onclick="doAction('kick')">👢 Kick</button>
+          <button class="action-btn btn-danger"  onclick="doAction('ban')">🔨 Ban</button>
+          <button class="action-btn btn-warning" onclick="doAction('warn')">⚠ Warn</button>
+          <button class="action-btn btn-warning" onclick="doAction('freeze')">❄ Freeze</button>
+          <button class="action-btn btn-info"    onclick="doAction('bring')">📍 Bring</button>
+          <button class="action-btn btn-info"    onclick="doAction('goto')">🚀 Goto</button>
+          <button class="action-btn btn-success" onclick="doAction('revive')">💊 Revive</button>
+          <button class="action-btn btn-info"    onclick="doAction('money')">💰 Soldi</button>
+          <button class="action-btn"             onclick="doAction('setrank')">🛡 Set Rank</button>
+          <button class="action-btn"             onclick="doAction('spectate')">👁 Spectate</button>
+        </div>
+
+        <!-- Sub-forms per azioni -->
+        <div id="action-form" class="hidden" style="margin-top:12px;">
+          <input type="text" id="action-reason" placeholder="Motivo..." style="width:100%;margin-bottom:8px;">
+          <input type="text" id="action-duration" placeholder="Durata (es: 7d, 24h, perm)" style="display:none;width:100%;margin-bottom:8px;">
+          <input type="number" id="action-amount" placeholder="Importo" style="display:none;width:100%;margin-bottom:8px;">
+          <select id="action-rank" style="display:none;width:100%;margin-bottom:8px;">
+            <option value="0">Rimuovi admin</option>
+            <option value="1">Moderatore</option>
+            <option value="2">Admin</option>
+            <option value="3">Senior Admin</option>
+            <option value="4">Owner</option>
+          </select>
+          <button class="btn-primary" onclick="confirmAction()" style="width:100%">Conferma</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast hidden"></div>
+
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
